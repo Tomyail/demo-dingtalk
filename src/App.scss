@@ -1,0 +1,14 @@
+.App {
+  text-align: center;
+  padding: 40px;
+  .btn {
+    background: #007aff;
+    color: #fff;
+    border-radius: 5px;
+    padding: 20px 50px;
+    border: none;
+    &:active{
+      background: darken(#007aff, 10%);
+    }
+  }
+}
