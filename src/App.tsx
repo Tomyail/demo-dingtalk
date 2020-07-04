@@ -9,6 +9,8 @@ function App() {
   const [audio, setAudio] = useState({});
   const [canPlay, setCanPlay] = useState(false);
   const [sound, setSound] = useState({ play: nx.noop });
+  const [recording, setRecording] = useState(false);
+  const [looping, setLooping] = useState(false);
 
   useEffect(() => {
     const url = `https://dth-api-beta.alo7.com/api/v1/ding_talk/signature_config?url=${window.location.href.split('#')[0]}`;
@@ -31,53 +33,84 @@ function App() {
 
   return (
     <div className="App">
-      <header>
-        Audio Data: {JSON.stringify(audio)};
-      </header>
+      <header className="status-loop">{looping ? '轮询中...' : '正常状态'}</header>
       <p>
-        <button className="btn" onClick={(e: any) => {
+        <button disabled={recording} className="btn" onClick={(e: any) => {
           dd.device.audio.startRecord({
             onSuccess: (res: any) => {
+              setRecording(true);
+              setCanPlay(false);
             }
           })
         }}>DD/Alo7:开始录音</button>
       </p>
 
       <p>
-        <button className="btn" onClick={(e: any) => {
+        <button disabled={!recording} className="btn" onClick={(e: any) => {
           dd.device.audio.stopRecord({
             onSuccess: (res: any) => {
               setAudio(res);
-              request('https://app50100.eapps.dingtalkcloud.com/api/v1/audio/score/%40lATPGpNyb46GgdHOCwNDls58ABDa').then(res => {
-                // alert(
-                //   JSON.stringify(res)
-                // );
-                const { status, audioUrl } = res;
-                if (status === 'FINISHED') {
-                  const sound = new Howl({
-                    html5: false,
-                    src: [audioUrl],
-                    // autoplay: true,
-                    // loop: true,
-                    volume: 1
-                  });
+              setRecording(false);
+              // alert('start read_aload_text!');
+              fetch('https://app50100.eapps.dingtalkcloud.com/api/v1/audio/score?type=READ_ALOUD_TEXT', {
+                method: 'POST',
+                headers: {
+                  corpid: 'ding41b4dab8436fe2ffa1320dcb25e91351',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  coreType: "en.sent.score",
+                  exerciseId: "500059929",
+                  mediaId: res.mediaId,
+                  refText: "Mr Jones, this is Miss Green.",
+                  url: res.remoteUrl
+                })
+              }).then(_ => {
 
-                  alert('audioUrl' + audioUrl);
+                setLooping(true);
+                var looptimer = setInterval(() => {
+                  request(`https://app50100.eapps.dingtalkcloud.com/api/v1/audio/score/${res.mediaId}`).then(response => {
+                    const { status, audioUrl } = response;
+                    if (status === 'FINISHED') {
+                      // cleartimer:
+                      clearInterval(looptimer);
+                      setLooping(false);
+                      const instance = new Howl({
+                        src: [audioUrl],
+                        // autoplay: true,
+                        html5: true,
+                        loop: false,
+                        volume: 1,
+                        onend: function () {
+                          console.log('Finished!');
+                        }
+                      });
 
-                  setSound(sound);
+                      // alert('audioUrl: \n' + audioUrl);
 
-                  sound.once('load', function () {
-                    setCanPlay(true);
-                  });
+                      setSound(instance);
 
-                }
-              })
+                      instance.once('load', function () {
+                        setCanPlay(true);
+                        // instance.play();
+                      });
+
+                    }
+                  })
+                  // end loop
+                }, 200);
+
+
+              });
+
+
+
             }
           })
         }}>DD/Alo7:停止录音</button>
       </p>
       <p>
-        <button className="btn" onClick={(e: any) => {
+        <button disabled={!canPlay} className="btn" onClick={(e: any) => {
           dd.device.audio.play({
             localAudioId: nx.get(audio, 'mediaId')
           });

@@ -2,10 +2,10 @@
   text-align: center;
   padding: 50px;
   .btn {
-    width: 100%;;
+    width: 100%;
     background: #007aff;
     color: #fff;
-    border-radius: 5px;
+    border-radius: 10px;
     padding: 20px 50px;
     border: none;
     &:active {
@@ -22,5 +22,12 @@
     &:active {
       background: darken(#5ac8fa, 10%);
     }
+  }
+
+  .status-loop {
+    border: 1px dashed #007aff;
+    font-size: 12px;
+    background: #eee;
+    padding: 10px;
   }
 }
