@@ -1,14 +1,26 @@
 .App {
   text-align: center;
-  padding: 40px;
+  padding: 50px;
   .btn {
+    width: 100%;;
     background: #007aff;
     color: #fff;
     border-radius: 5px;
     padding: 20px 50px;
     border: none;
-    &:active{
+    &:active {
       background: darken(#007aff, 10%);
+    }
+    &[disabled] {
+      background: #ccc;
+      color: #999;
+    }
+  }
+
+  .btn-alo7 {
+    background: #5ac8fa;
+    &:active {
+      background: darken(#5ac8fa, 10%);
     }
   }
 }
