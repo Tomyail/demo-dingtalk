@@ -5,6 +5,17 @@ import nx from '@feizheng/next-js-core2';
 import { Howl } from 'howler';
 import './App.scss';
 
+function copyToClipboard(text: string) {
+  const input: any = document.createElement('input');
+  input.style.position = 'fixed';
+  input.style.opacity = 0;
+  input.value = text;
+  document.body.appendChild(input);
+  input.select();
+  document.execCommand('Copy');
+  document.body.removeChild(input);
+};
+
 function App() {
   const [audio, setAudio] = useState({});
   const [canPlay, setCanPlay] = useState(false);
@@ -23,6 +34,7 @@ function App() {
           'device.audio.startRecord',
           'device.audio.stopRecord',
           'device.audio.onRecordEnd',
+          'device.audio.download',
           'device.audio.play',
         ]
       });
@@ -51,6 +63,7 @@ function App() {
             onSuccess: (res: any) => {
               setAudio(res);
               setRecording(false);
+              setLooping(true);
               // alert('start read_aload_text!');
               fetch('https://app50100.eapps.dingtalkcloud.com/api/v1/audio/score?type=READ_ALOUD_TEXT', {
                 method: 'POST',
@@ -66,11 +79,13 @@ function App() {
                   url: res.remoteUrl
                 })
               }).then(_ => {
-
-                setLooping(true);
                 var looptimer = setInterval(() => {
                   request(`https://app50100.eapps.dingtalkcloud.com/api/v1/audio/score/${res.mediaId}`).then(response => {
                     const { status, audioUrl } = response;
+                    setAudio({
+                      ...res,
+                      mp3: audioUrl
+                    })
                     if (status === 'FINISHED') {
                       // cleartimer:
                       clearInterval(looptimer);
@@ -111,18 +126,33 @@ function App() {
       </p>
       <p>
         <button disabled={!canPlay} className="btn" onClick={(e: any) => {
-          dd.device.audio.play({
-            localAudioId: nx.get(audio, 'mediaId')
-          });
+          const mediaId = nx.get(audio, 'mediaId');
+          
+          dd.device.audio.download({
+            mediaId,
+            onSuccess: () => {
+              dd.device.audio.play({
+                localAudioId: nx.get(audio, 'mediaId')
+              });
+            }
+          })
+
         }}>DD:播放录音</button>
       </p>
-
-      <hr />
 
       <p>
         <button disabled={!canPlay} className="btn btn-alo7" onClick={(e: any) => {
           sound && sound.play();
         }}>Alo7:播放录音</button>
+      </p>
+
+      <hr />
+      <p>
+        <button className="btn" disabled={!canPlay} onClick={(e: any) => {
+          copyToClipboard(JSON.stringify(audio))
+        }}>
+          复制 Audio 链接
+        </button>
       </p>
     </div>
   );
