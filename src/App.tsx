@@ -1,12 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import request from './request';
 import dd from 'dingtalk-jsapi';
+import nx from '@feizheng/next-js-core2';
 import './App.scss';
 
-declare var nx: any;
-
-
 function App() {
+  const [audio, setAudio] = useState({});
   useEffect(() => {
     const url = `https://dth-api-beta.alo7.com/api/v1/ding_talk/signature_config?url=${window.location.href.split('#')[0]}`;
 
@@ -18,22 +17,20 @@ function App() {
           'device.audio.startRecord',
           'device.audio.stopRecord',
           'device.audio.onRecordEnd',
-          'device.audio.paly',
+          'device.audio.play',
         ]
       });
-      // alert(
-      //   JSON.stringify(sign)
-      // );
+
       dd.config(sign);
     })
   }, []);
+
   return (
     <div className="App">
       <p>
         <button className="btn" onClick={(e: any) => {
           dd.device.audio.startRecord({
             onSuccess: (res: any) => {
-              console.log('start record!');
             }
           })
         }}>DD:开始录音</button>
@@ -41,18 +38,21 @@ function App() {
 
       <p>
         <button className="btn" onClick={(e: any) => {
-          dd.device.audio.onRecordEnd({
+          dd.device.audio.stopRecord({
             onSuccess: (res: any) => {
               alert(
                 JSON.stringify(res)
               );
+              setAudio(res);
             }
           })
         }}>DD:停止录音</button>
       </p>
       <p>
         <button className="btn" onClick={(e: any) => {
-          console.log('click!');
+          dd.device.audio.play({
+            localAudioId: nx.get(audio, 'mediaId')
+          });
         }}>DD:播放录音</button>
       </p>
     </div>
