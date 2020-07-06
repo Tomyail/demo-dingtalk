@@ -90,10 +90,18 @@ function App() {
                       // cleartimer:
                       clearInterval(looptimer);
                       setLooping(false);
+                       //@ts-ignore
+                      if(sound && sound.state){
+                         //@ts-ignore
+                        //@ts-ignore
+                        sound.unload()
+                          //@ts-ignore
+                        console.log(Howler._html5AudioPool)
+                      }
                       const instance = new Howl({
                         src: [audioUrl],
                         // autoplay: true,
-                        // html5: true,
+                        html5: true,
                         loop: false,
                         volume: 1,
                         onend: function () {
@@ -103,6 +111,7 @@ function App() {
 
                       // alert('audioUrl: \n' + audioUrl);
 
+                      
                       setSound(instance);
 
                       instance.once('load', function () {
