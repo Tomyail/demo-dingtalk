@@ -4,20 +4,19 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App0 from './App';
-import App1 from './App1';
+import App1 from './log';
 import App2 from './App2';
 import App3 from './App3';
 import * as serviceWorker from './serviceWorker';
 
 const Wrapper = () => {
-  const [Apps] = useState([App2, App3]);
-  const [currentApp, setApp] = useState(0);
+  const [Apps] = useState([App1, App2, App3]);
+  const [currentApp, setApp] = useState(1);
   return (
     <div>
-      {/* <button onClick={() => setApp(0)}>app0(howler:webaudio)</button> */}
-      {/* <button onClick={() => setApp(1)}>app1(howler:h5audio)</button> */}
-      <button onClick={() => setApp(0)}>app0(audio)</button>
-      <button onClick={() => setApp(1)}>app1(audio+rxjs)</button>
+      <button onClick={() => setApp(0)}>app1(audio+log)</button>
+      <button onClick={() => setApp(1)}>app2(audio)</button>
+      <button onClick={() => setApp(2)}>app3(audio+rxjs)</button>
       {`当前选择 ${currentApp}`}
       {React.createElement(Apps[currentApp])}
     </div>
