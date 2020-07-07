@@ -3,20 +3,31 @@ import 'react-app-polyfill/stable';
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App0 from './App';
 import App1 from './log';
-import App2 from './App2';
-import App3 from './App3';
+import App4 from './App4';
 import * as serviceWorker from './serviceWorker';
 
 const Wrapper = () => {
-  const [Apps] = useState([App1, App2, App3]);
+  const [Apps] = useState([App1, App4]);
   const [currentApp, setApp] = useState(1);
   return (
     <div>
-      <button onClick={() => setApp(0)}>app1(audio+log)</button>
-      <button onClick={() => setApp(1)}>app2(audio)</button>
-      <button onClick={() => setApp(2)}>app3(audio+rxjs)</button>
+      <button
+        onClick={() => {
+          console.log('切换到 demo 0');
+          setApp(0);
+        }}
+      >
+        app1(audio+log)
+      </button>
+      <button
+        onClick={() => {
+          console.log('切换到 demo 1');
+          setApp(1);
+        }}
+      >
+        app2(native+log)
+      </button>
       {`当前选择 ${currentApp}`}
       {React.createElement(Apps[currentApp])}
     </div>
